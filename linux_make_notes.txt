@@ -1,0 +1,63 @@
+- make format
+ - make file consistof rules and each rule having
+    - Target
+    - set of prerequest's
+    - set of recipe's
+
+- Target
+    - its is name of,
+        - executable.
+        - object file.
+        - action to carry out such as "clean".
+        
+- Prerequest is a file used as input to target.
+
+- recipe is an action that make carries out.
+    - need to put a tab character at the beginning of every recipe line
+    - If you prefer to prefix your recipes with a character other than tab, can set the .RECIPEPREFIX variable to an alternate character.
+
+- Phony: Target that do not refer to any files but are just actions called Phony targets.
+    - example
+        .PHONY: clean
+        clean: 
+            rm exe main.o
+
+- Process MakeFile
+    - start with default goal which can override this behaviour using command line .DEFAULT_GOAL.
+    - Other rules are processed which are Prerequest of goal.
+    - On upate of any prerequest rule or file, goal updated again. If no prerequest rule or file updated wont update goal.
+ 
+- Variable
+    - VAR_NAME = rule1 rule2 rule3 ...
+    - Acces by using "$(VAR_NAME)".
+    - example
+        OBJS = sample1.o sample2.o sample3.o
+        all: $(OBJS)
+            cc -o exe $(OBJS)
+
+- Wrting Makefiles
+    - Makefile contains
+        - Exexplicit rule
+            - when and how to remake one or more files, called the rule’s targets.
+        - Implicit rule
+            - when and how to remake a class of files based on their names.
+            - how a target may depend on a file with a name similar to the target and gives a recipe to create or update such a target
+        - Varliable 
+            - Variable is a line that specifies a text string value for a variable that can be substituted into the text later.
+        - Directive
+            - A directive is an instruction for make to do something special while reading the makefile. These includes
+            - 
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+        
+            
+            
+            
