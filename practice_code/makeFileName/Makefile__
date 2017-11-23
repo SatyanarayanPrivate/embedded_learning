@@ -1,0 +1,4 @@
+
+
+target: test1.o
+	cc -o target test1.o

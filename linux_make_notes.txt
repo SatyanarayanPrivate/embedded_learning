@@ -37,22 +37,43 @@
 
 - Wrting Makefiles
     - Makefile contains
-        - Exexplicit rule
+        1 Exexplicit rule
             - when and how to remake one or more files, called the rule’s targets.
-        - Implicit rule
+        2 Implicit rule
             - when and how to remake a class of files based on their names.
             - how a target may depend on a file with a name similar to the target and gives a recipe to create or update such a target
-        - Varliable 
+        3 Varliable 
             - Variable is a line that specifies a text string value for a variable that can be substituted into the text later.
-        - Directive
+        4 Directive
             - A directive is an instruction for make to do something special while reading the makefile. These includes
-            - 
+                - Reading another makefile.
+                - Decinding.
+                - Defining a variable from a verbatim string containing multiple lines.
+         5 Comment
+            - ‘#’ in a line of a makefile starts a comment
             
             
-            
-            
-            
-            
+    - Including other Makefiles
+        - When make processes an include directive, it suspends reading of the containing makefile and reads from each listed file in turn. 
+        - When that is finished, make resumes reading the makefile in which the directive appears.
+        - framework
+            include filenames...
+        - If filenames is empty, nothing is included and no error is printed.
+        - example
+            For example, if you have three .mk files, a.mk, b.mk, and c.mk, and $(bar) expands to bish bash, then the following expression ar equivalent
+            include foo *.mk $(bar)
+            include foo a.mk b.mk c.mk bish bash
+
+- Name to makefile
+    - Normally you should call your makefile either makefile or Makefile.
+    - If you want to use a nonstandard name for your makefile, you can specify the makefile name with the ‘-f’ or ‘--file’ option. 
+    - The arguments ‘-f name’ or ‘--file=name’ tell make to read the file name as the makefile
+    example: 
+        $ make -f sampleMakefile.mk
+        $ make -f sampleMakefile.mk clean
+        
+
+    
             
             
             
