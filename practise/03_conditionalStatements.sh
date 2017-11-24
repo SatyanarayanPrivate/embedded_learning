@@ -38,5 +38,31 @@ if (( ((inNum > 0)) && ((inNum < 10)) )); then
 fi
 
 
+# String Comparision
+
+str1=""
+str2="sad"
+str3="happy"
+
+if [ "$str1" ]; then
+    echo "$str1 is not null"
+fi
+
+if [ -z "$str1" ]; then
+    echo "$str1 is null"
+fi
+
+if [ "$str2" == "$str3" ]; then
+    echo "$str2 equals to $str3"
+elif [ "$str2" != "$str3" ]; then
+    echo "$str2 not equals to $str3"
+fi
+
+if [ "$str2" > "$str3" ]; then
+    echo "$str2 greater than $str3"
+elif [ "$str2" < "$str3" ]; then
+    echo "$str2 less than $str3"
+fi
+
 
 

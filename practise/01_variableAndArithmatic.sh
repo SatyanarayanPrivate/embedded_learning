@@ -15,7 +15,7 @@ myVar_1="TestVariable1" # string variable
 echo "String Var: $myVar_1"
 echo "String Var: $((myVar_1))" # prints zero:  ???
 
-charVar_1='s' # Char variable
+charVar_1='s' # Char variable same string
 echo "Char Var: $charVar_1"
 echo "Char Var: $((charVar_1))" # prints zero:  ???
 
