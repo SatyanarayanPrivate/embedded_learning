@@ -1,0 +1,18 @@
+http://xillybus.com/tutorials/uboot-hacking-howto-3
+
+The three functions of code in U-Boot
+
+One can divide the code into three types (parallel to the sorts of modifications, mentioned above):
+
+    * Pure initialization code: This code always runs during U-Boot’s own bring-up.
+    * “Drivers”: Code that implements a set of functions, which gives access to a certain piece of hardware. Much of this is found in drivers/, fs/ and others.
+    * Commands: Adding commands to the U-Boot shell, and implementing their functionality, typically based upon calls to driver API. These appear as common/cmd_*.c
+    
+The sequence for the ARM architecture can be deduced from arch/arm/lib/crt0.S, which is the absolutely first thing that runs. This piece of assembly code calls functions as follows (along with some very low-level initializations):
+
+    * board_init_f() (defined in e.g. arch/arm/lib/board.c): Calls the functions listed in the init_sequence_f function pointer array (using initcall_run_list() ), which is enlisted in this file with a lot of ifdefs. This function then runs various ifdef-dependent init snippets.
+    * relocate_code()
+    * coloured_LED_init() and red_led_on() are directly called by crt0.S. Defining these functions allow hooking visible indications of early boot progress.
+    * board_init_r() (also possibly defined in arch/arm/lib/board.c): Runs the initialization as a “normal” program running from RAM. This function never returns. Rather,
+    * board_init_r()  loops on main_loop() (defined in common/main.c) forever. This is essentially the autoboot or execution of commands from input by the command parser (most likely hush).
+    At some stage, a command in main_loop() gives the control to the Linux kernel (or whatever was loaded instead).
