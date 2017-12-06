@@ -1,0 +1,108 @@
+# File I/O #
+    - int open (const char *filePath, int flags, mode_t mode)
+        - flags: O_RDONLY, O_WRONLY, O_RDWR, O_CREAT, O_NONBLOCK and etc.
+        - mode: S_IRWXU, S_IRUSR, S_IWUSR, S_IRWXG and etc.
+        - return: On success valid file descriptor, on error -1 with error value errno.
+
+    - int read (int fd, char *buf, size_t len)
+        - fd: file descriptor.
+        - buf: buffer in which read data stored.
+        - len: number of bytes to read.
+        - return: 
+                - On success return number of bytes read. On error return -1 with error value errno.
+                - return 0 indicates EOF.
+                - for O_NONBLOCK will return -1 with errno EAGAIN.
+
+    - int write (int fd, const char *buf, int len);
+        - return: On success number of bytes written. -1 on error with error errno.
+
+    - int fsync (int fd)
+        - return: On success 0 and -1 on failure with error value errno.
+
+    - int fdatasync(int fd)
+        - return: On success 0 and -1 on failure with error value errno.
+
+    - int close (int fd)
+        - return: On success 0 and -1 on failure with error value errno.
+
+    - off_t lseek (int fd, off_t pos, int origin)
+        - pos: +ve or -ve.
+        - origin: SEEK_CUR, SEEK_END and SEEK_SET.
+        - return: On success new file position and -1 on failure with error value errno.
+
+    - int select (int n, fd_set *readFdSet, fd_set *writeFdSet, fd_set *exceptiionFdSet, struc timeval *timeout);
+        - n: value of the highest-valued file descriptor in any set, plus one.
+        - readFdSet, writeFdSet, exceptiionFdSet: respected fd sets (array).
+        - timeout: pointer to time info. (struct timeval{ long tv_sec; long tv_usec;}).
+        - return: number of file descriptors ready for I/O. 0 if timeout occurs. -1 on error with error value errno.
+        - frame work:
+            fd_set readSet;
+            FD_ZERO(&readSet);
+            FD_SET(operationalFd, &readSet);
+            select(operationalFd + 1, &readSet, NULL, NULL, &timeout);
+            if (FD_ISSET(operationalFd, &readSet) != 0)  // non zero if operationalFd is present in readSet
+                // read operation on operationalFd
+            FD_CLR(operationalFd, &readSet);
+    
+    - int close (int fd)
+        - return: 0 on success. On error, it returns -1, and sets errno appropriately.
+
+# end of FILE I/O #
+
+
+# Standard I/O
+    - FILE *fopen (const char *filePath, const char *mode
+        - mode: r, r+, w, w+, a, a+, b (in some architechture).
+        - return: FILE pointer On success, NULL on failure with error value errno.
+     
+    - FILE *fopen(int fd, const char *mode);
+        - fd: file descriptor
+
+    - int fclose (FILE *filePtr);
+    - int fcloseall (void);
+        - return: 0 on success. On error, it returns -1, and sets errno appropriately.
+        
+    - char *fgets(char *buf, FILE *filePtr);
+        - return: On success, buf is returned; on failure, NULL is returned.
+        
+    - ssize_t fread (char *buf, ssize_t size, ssize_t nr, FILE *filePtr);
+        - size, nr: read "size" bytes with "nr" number of times from filePtr.
+        - return: Upon success number of times "size" bytes read. EOF or less than nr denotes error using ferror() and feof() identify exact cause.
+
+    - int fputs(const char *buf, FILE *filePtr);
+        - return: On success, non negative number; on failure, EOF is returned.
+        
+    - ssize_t fwrite(const char *buf, ssize_t size, ssize_t nr, FILE *filePtr);
+        - size, nr: write "size" bytes with "nr" number of times from filePtr.
+        - return: Upon success number of times "size" bytes write. less than nr denotes error.
+
+    - int fseek (FILE *fileptr, long offset, int whence)
+        - whence: SEEK_CUR, SEEK_END and SEEK_SET
+        - return: 0 on success, -1 on error with value errno.
+        
+    - int ftell (FILE *filePtr);
+        - return: file position on success, -1 on error with value errno.
+        
+    - int fflush (FILE *stream);
+        - return: file position on success, EOF on error with value errno.
+        
+    - int ferror (FILE *stream);
+        - return: non-zero value indicator if any set, otherwise 0
+        
+    - int feof (FILE *stream);
+        - return: non-zero value indicator if any set, otherwise 0
+        
+    - void clearerr (FILE *stream);
+        - clears the error and the EOF indicators for stream.
+        
+    - int fileno(FILE *stream);
+        - return: associated file descriptor.
+        
+    - int setvbuf (FILE *stream, char *buf, int mode, size_t size);
+        - mode: _IONBF, _IOLBF, _IOFBF
+        
+    - void flockfile (FILE *stream);
+    - void funlockfile (FILE *stream);
+    - int ftrylockfile (FILE *stream);
+        - return: If stream is currently locked return non-zero, If stream is not currently locked return 0.
+        

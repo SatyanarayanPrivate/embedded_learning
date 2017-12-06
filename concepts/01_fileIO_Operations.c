@@ -61,6 +61,7 @@ int fsync (int fd);
     - The call writes back both data and metadata, such as creation timestamps, and other attributes contained in the inode.
 return: 
     - It will not return until the hard drive says that the data and metadata are on the disk.
+    - On success 0 and -1 on failure with error value errno.
 
 int fdatasync (int fd);
     - This system call does the same thing as fsync( ), except that it only flushes data.

@@ -4,6 +4,9 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sys/uio.h>
+#include <unistd.h>
+#include <sys/mman.h>
+
 
 /* Advanced FILE IO
 
@@ -39,7 +42,77 @@ struct iovec {
 */
 
 
-int main () {
+/* mmap()
+- When you map a file descriptor, the file's reference count is incremented.
+- Therefore, you can close the file descriptor after mapping the file, and your process will still have access to it.
+- The corresponding decrement of the file's reference count will occur when you unmap the file, or when the process terminates.
+- SIGBUS: signal is generated when a process attempts to access a region of a mapping that is no longer valid—example, because the file was truncated after it was mapped.
+- SIGSEGV: This signal is generated when a process attempts to write to a region that is mapped read-only.
+
+void * mmap (void *addr, size_t len, int prot, int flags, int fd, off_t offset);
+    - mmap( ) asks the kernel to map len bytes of the object represented by the file descriptor fd, starting at offset bytes into the file, into memory. If addr is included, it indicates a preference to use that starting address in memory. The access permissions are dictated by prot, and additional behavior can be given by flags.
+    - addr: most of cases 0
+    - prot: 
+        - PROT_NONE: not be accessed.
+        - PROT_READ: The pages may be read.
+        - PROT_WRITE: The pages may be written.
+        - PROT_EXEC: The pages may be executed.
+    - flags: type of mapping, and some elements of its behavior
+        - MAP_FIXED:
+            - If the kernel is unable to place the mapping at the given address, the call fails.
+            - If the address and length parameters overlap an existing mapping, the overlapped pages are discarded and replaced by the new mapping.
+        - MAP_PRIVATE:
+            - States that the mapping is not shared. The file is mapped copy-on-write
+            - any changes made in memory by this process are not reflected in the actual file, or in the mappings of other processes.
+        - MAP_SHARED:
+            - Shares the mapping with all other processes that map this same file.
+            - Writing into the mapping is equivalent to writing to the file. Reads from the mapping will reflect the writes of other processes.
+    - return:
+            - On success, a call to mmap( ) returns the location of the mapping.
+            - On failure, the call returns MAP_FAILED, and sets errno appropriately.
+            - A call to mmap( ) never returns 0.
+    - example: the following snippet maps the file backed by fd, beginning with its first byte, and extending for len bytes, into a read-only mapping
+        void *p;
+        p = mmap (0, len, PROT_READ, MAP_SHARED, fd, 0);
+        if (p == MAP_FAILED)
+            perror ("mmap");
+
+int munmap (void *addr, size_t len);
+    - return: On success, munmap( ) returns 0; on failure, it returns -1, and errno is set appropriately. The only standard errno value is EINVAL
+*/
+
+/* Resizing a Mapping
+void * mremap (void *addr, size_t old_size, size_t new_size, unsigned long flags);    
+    - The flags parameter can be either 0 or MREMAP_MAYMOVE, which specifies that the kernel is free to move the mapping.
+    - return: returns a pointer to the newly resized memory mapping. On failure, it returns MAP_FAILED, and sets errno.
+*/
+
+/* Changing the Protection of a Mapping
+int mprotect (const void *addr, size_t len, int prot);
+    - return: On success, mprotect( ) returns 0. On failure, it returns -1, and sets errno.
+*/
+
+
+/* Synchronizing a File with a Mapping
+- A call to msync( ) flushes back to disk any changes made to a file mapped via mmap(), synchronizing the mapped file with the mapping.
+- Without invocation of msync( ), there is no guarantee that a dirty mapping will be written back to disk until the file is unmapped.
+
+int msync (void *addr, size_t len, int flags);
+    - flags:
+        - MS_ASYNC:
+            - Specifies that synchronization should occur asynchronously.
+            - The update is scheduled, but the msync( ) call returns immediately without waiting for the writes to take place.
+        - MS_INVALIDATE:
+            - Specifies that all other cached copies of the mapping be invalidated.
+            - Any future access to any mappings of this file will reflect the newly synchronized on-disk contents.
+        - MS_SYNC:
+            - Specifies that synchronization should occur synchronously.
+            - The msync( ) call will not return until all pages are written back to disk.
+    - return: On success, returns 0. On failure, the call returns -1, and sets errno appropriately        
+*/
+
+
+int main (int argc, char *argv[]) {
     {// readv and writev
         struct iovec iov[3];
         ssize_t nr;
@@ -101,6 +174,47 @@ int main () {
         }
     }
             
+    { // mmap() and munmap()
+
+        struct stat sb;
+        off_t len;
+        char *p;
+        int fd;
+        if (argc < 2) {
+            fprintf (stderr, "usage: %s <file>\n", argv[0]);
+            return 1;
+        }
+        fd = open (argv[1], O_RDONLY);
+        if (fd == -1) {
+            perror ("open");
+            return 1;
+        }
+        if (fstat (fd, &sb) == -1) {    // fstat( ) returns information about a given file
+            perror ("fstat");
+            return 1;
+        }
+        if (!S_ISREG (sb.st_mode)) {    // to check for regular file
+            fprintf (stderr, "%s is not a file\n", argv[1]);
+            return 1;
+        }
+        p = mmap (0, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+        if (p == MAP_FAILED) {
+            perror ("mmap");
+            return 1;
+        }
+        if (close (fd) == -1) {
+            perror ("close");
+            return 1;
+        }
+        for (len = 0; len < sb.st_size; len++)
+            putchar (p[len]);
+        if (munmap (p, sb.st_size) == -1) {
+            perror ("munmap");
+            return 1;
+        }
+    }
+
+
     printf ("\n");
     return 0;
 }
