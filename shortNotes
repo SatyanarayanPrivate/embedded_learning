@@ -142,4 +142,30 @@ int msync(void *addr, ssize_t len, int flags);
 - The first of these processes that exists is executed as the init process.
 - If all four processes fail to execute, the Linux kernel halts the system with a panic.
 
+int execl (const char *path, const char *arg, ...);
+    - list of argument should be NULL terminated.
+    - example:
+        - execl ("/bin/vi", "vi", "test.txt", NULL);
+int execlp (const char *file, const char *arg, ...);
+int execle (const char *path, const char *arg, ..., char * const envp[]);
+int execv (const char *path, char *const argv[]);
+int execvp (const char *file, char *const argv[]);
+int execve (const char *filename, char *const argv[], char *const envp[]); 
+    - The l and v delineate whether the arguments are provided via a l ist or an array ( v ector).
+    - The p denotes that the user's full p ath is searched for the given file.
+    - the e notes that a new environment is also supplied for the new process
 
+pid_t fork()
+    - return: non-zero in parent process, zero in child process and -1 if any error which sets errno.
+pid_t vfork()
+    - in child immediately should call to exec functions.
+
+void exit(int status)
+int atexit(void (*func) (void));
+int on_exit (void (*function)(int, void *), void *arg);
+
+pid_t wait(int *status)
+    - return: child pid > 0, or -1 on error.
+    
+pid_t waitpid (pid_t pid, int *status, int options);
+    - pid: <-1: wait for child process whose gid is absulute value as pid, -1: as like wait(), 0: wait for child process whose gid as current process. >0: pid of specific child process.
