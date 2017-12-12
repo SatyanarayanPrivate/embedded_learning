@@ -1,0 +1,11 @@
+
+
+UART: 
+- TX, RX, RTS (Request to Send), CTS (Clear to Send)
+- Asynchronous communication: as there is no involved while communication, So two devices has to be same baudrate/ bit rate.
+ -------------------------------------------------------------------
+| start bit (low) | 8 data bits (LSB 1st) | parity bit | stop bit   |
+ -------------------------------------------------------------------
+    - parity bit: error checking mechanisam
+        - even: If no. of ones in data bits are even send 1 or else send 0.
+        - odd: If no. of ones in data bits are odd send 1 or else send 0.

@@ -1,0 +1,43 @@
+PLL Operations:
+PLLCON      R/W Control register: used to enabled and disable pll operation.
+PLLCFG      R/W Configuration register: used to configure multiplier and divider values.
+PLLSTAT     RO  Status register 0 12
+PLLFEED     WO  Feed register
+
+Power Mode Control register: PCON
+PCON        R/W Power Control register: Controls for some reduced power modes and other power related controls are contained in the PCON register
+PCONP       R/W Power Control for Peripherals: The PCONP register allows turning off selected peripheral functions for the purpose of saving power.
+
+Clock dividers
+EMCCLKSEL   R/W External Memory Controller Clock Selection register
+CCLKSEL     R/W CPU Clock Selection register
+USBCLKSEL   R/W USB Clock Selection register
+
+External Interrupts
+EXTINT      R/W External Interrupt Flag register
+EXTMODE     R/W External Interrupt Mode register: edge detection or level detection
+EXTPOLAR    R/W External Interrupt Polarity Register: active low or active high
+
+MII: Media independent interface
+ENET_TX_EN Output Transmit data enable, active low.
+ENET_TXD3:0 Output Transmit data, 4 bits.
+ENET_TX_ER Output Transmit error.
+ENET_TX_CLK Input Transmitter clock.
+ENET_RX_DV Input Receive data valid.
+ENET_RXD3:0 Input Receive data, 4 bits.
+ENET_RX_ER Input Receive error.
+ENET_RX_CLK Input Receive clock.
+ENET_COL Input Collision detect.
+ENET_CRS Input Carrier sense.
+
+RMII: Reduced Media Independent Interface
+ENET_TX_EN Output Transmit data enable, active low.
+ENET_TXD1:0 Output Transmit data, 2 bits
+ENET_RXD1:0 Input Receive data, 2 bits.
+ENET_RX_ER Input Receive error.
+ENET_CRS Input ENET_CRS_DV. Carrier sense/data valid.
+ENET_RX_CLK Input ENET_REF_CLK. Reference clock.
+
+MIIM: Media Independent Interface Management
+ENET_MDC Output MIIM clock.
+ENET_MDIO Input/Output MI data input and output
