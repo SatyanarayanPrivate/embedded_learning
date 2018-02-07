@@ -206,8 +206,12 @@ Generate assembly code:
 ------------------------------------------------------------------------------------------------------------------------------------------------------
 - operator new and delete
     - operator new and delete bydefault are static
-    - Ctor gets called after operator new.
-    - operator delete gets called after Dtor.
+    - new 
+        1) allot memory(malloc)
+        2) call Ctor
+    - delete.
+        1) call Dtor
+        2) free()
     - internal operations on new operator
         CAT *temp = operator new(){return addr}; // new operator exceptions are handled by inner try block.
         try {
