@@ -1,0 +1,577 @@
+==========================================================================================================================================================
+Functions::
+Generate assembly code:
+    $ g++ -g -c naming_conventions.cpp
+    $ objdump -d -M intel -S naming_conventions.o
+    
+    $ g++ -S -o my_asm_output.s example02.cpp
+    
+    $ g++ -save-temps -fverbose-asm 1FunctionProAndEpilog.cpp
+    $ gcc -save-temps -fverbose-asm 1FunctionProAndEpilog.c
+    
+    $ g++ -save-temps -fverbose-asm file_name.cpp && cat file_name.s
+==========================================================================================================================================================
+
+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+UML=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+- simple class
+    1) Class name
+    2) membe type
+        - TYPE
+            - -:: private
+            - +:: public
+            - #:: protected
+            - uonder line:: static
+        - example
+            - TYPE variable_name:data_type
+    3) Methods
+        - TYPE
+            - -:: private
+            - +:: public
+            - #:: protected
+            - uonder line:: static
+        - example
+            - TYPE method_name:return_data_type
+- Abstract class
+    1) class name (italic font)
+    2)
+    3) Methods
+        - *
+        - example
+            - * func()
+                virtual void fun()= 0;
+- interface class
+    1) <<class name>>
+    2)
+    3) Methods
+- class B extends class A. (is a relation)
+    - uses continuous hollow triangle arrow from class B(simple class) to class A(simple class).
+- class B implements class A
+    - uses dotted hollow triangle arrow from class B(simple class) to class A(interface class)
+- one interface class to one interface class should extends.
+- class A has class B or class A has class B.(has a relation)
+    - simple horizontal line (bi-directional).A_____B
+    - may contain pointer or object or reference.
+- class A has class B.(association)(has a relation)
+    - simple horizontal arrow (uni-directional).A____>B
+    - may contain pointer or object or reference.
+    - association
+        - B created somewhere added after that.
+        - A dies B will survive.
+- class A<>____>B(aggregation)
+    - A<>_____>B
+    - aggregation relation.
+    - use as local object
+        - B created along with A.
+        - A dies B also dies.
+    - example
+        class CA {
+            CB *ptr;
+            void SetB(CB *ptr1)
+                ptr= ptr1;
+            }
+            ~CA() {delete ptr;}
+        }
+- class A<||>_______>class B (composotion)
+    - create with A dies with A.
+    example:: smart pointer.
+    - class CA {
+        CB *ptr;
+        public:
+            CA(): ptr(new (CB)){}
+            ~CA(){ delete ptr;}
+        }
+- class A -----> class B (dependency)
+    - dotted horizontal arrow towards B.
+    -
+        class CA {
+            void func(CB *ptr) {
+                ptr->fun();
+            }
+        }
+        class CB {
+        public:
+            void fun() {}
+        }        
+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+ UML END =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+
+
+- Constructor
+    - default Ctor
+        CA::CA() {}
+    - Copy Ctor 
+        - Copy Ctor should have always reference parameter, else stack overflow occure bcz if you as value copy ctor gets called recursively
+            CA::CA(const CA &obj) {}
+    - paramter ctor
+        CA::CA(int x, int y) {}
+    - initializaer_list ctor
+        - priority of initializer_list is high compare to param ctor.
+        CA::CA(initializer_list<int> list) {
+            initializer_list <int>::iterator its= list.begin();
+            for (size_t i = 0x00; i < (list.size()); its++, i++)        
+        }      
+    - Ctor with initializer list 
+        - order of initialization should be matched with order declairation.
+            CA::CA(int x, int y): x(0), y(0){}
+            fun() {
+                CA(1,2);
+            }
+    - move Ctor
+        - which used to supress copy object to rvalue address.
+        - CA (CA &&obj):ptr(par.ptr),ptr1(par.ptr1) {
+                ptr= NULL;ptr1= NULL;//mandatory to set null
+          }
+    - obj holds temp object.
+    - this holds rvalue object.
+    - prefect forwarding
+        - forword calling containment ctor with param in container.
+        CA::CA():x(0), y("default") {cout << "CA default Ctor" <<endl;}
+        CA::CA(int x):x(x), y(to_string(x)) {cout << "CA one param(int) Ctor" <<endl;}
+        CA::CA(string str): x(stoi(str)), y(str) {cout << "CA one param(string) Ctor" <<endl;}
+        class Container {
+            CA ca_obj;
+        public:
+            template <typename... Args>
+            Container(Args&&... args):obj(forward<Args>(args)...){}
+        }
+        fun() {
+            Container obj1;         // CA default Ctor
+            Container obj2(10);     // CA one param(int) Ctor
+            Container obj3(10,1);   // CA two param(int) Ctor
+            Container obj4("10");   // CA one param(string) Ctor
+        }
+    - deligating constructor (constructor deligation)
+        - CA(): CA(10){}
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- sizeof empty class 1byte
+    - bcz to access this pointer
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- interface class
+    - class having only pure virtual functions.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Abstract class
+    - class having other methods with some pure virtual functions.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- nice class
+    - STL always accepts only Nice class only.
+    - which contains
+        - Default Ctor
+        - copy ctor
+        - all comparison operator overloaded
+        - assignment operator overloaded
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- explicit keyword
+    - Used to suppress casting and allows only parameterized constructor.
+    - explicit Ctor
+        - Restrict multi_param with {} Ctor to called.
+            explicit CA(int x, int y) {cout << "CA multi param Ctor" << endl;}
+            fun() {
+                CA obj= {1,3};// error
+                CA obj(1,2);
+            }
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- operator overloading
+    - normal
+        CA& CA::operator+(const CA &obj) {return *this;}
+    - parameterized
+        friend CA operator+(int val, CA &obj){return obj;}
+    - casting operator
+        CA::operator int() { return val;}
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- closure/functors
+    - carry the parent context to callback
+    - implemented using functors
+        - functors contains refernce of local objects.
+        - has overloaded operator().
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- friend 
+    - function
+        - grand permission to private state through object.
+        - friend function does not belongs to class.
+    - class
+        - grand permission to private state.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Creator or Factory
+    - controlling creating object
+    - produce service object
+    - creator:: gives own class
+    - factory:: gives other class
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Smart pointer
+    - Manage memory
+    - smart pointer should not be allowed on heap
+    - samrt should be overlaoded with operator->().
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- shared pointer
+    - holds reference count of each object.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- operator new and delete
+    - operator new and delete bydefault are static
+    - Ctor gets called after operator new.
+    - operator delete gets called after Dtor.
+    - internal operations on new operator
+        CAT *temp = operator new(){return addr}; // new operator exceptions are handled by inner try block.
+        try {
+            temp->CAT::CAT();
+        }
+        catch (...){
+            free(temp);
+            throw;
+        }
+        objPtr = temp;
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Template
+    - template is compile time concept
+    - template specializations
+        template<>
+        class Stack<int> {};
+    - template with default argument
+        - template<typename T=double>
+        - template<typename T=double, int size=5>
+    - partial spetialization
+        - template<typename T1>   
+          class Stack<int, T1>{};  
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- encapsulation:
+    - having data and method together
+    - hide data and expose methods
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Abstract
+    - hiding complexcity
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- enum
+    - scoped enum vs non scoped enum.
+        //enum forward declaration new c++11
+        enum class Colors;
+        enum class Color { RED, GREEN, BLUE };
+        enum class Feelings { EXCITED, MOODY, BLUE };
+        //Well-defined enum sizes 
+        enum class ColorsWithCharSize : char { RED = 1, GREEN = 2, BLUE = 3 };
+        enum class ColorsWith8Bits : std::int8_t { RED = 1, GREEN = 2, BLUE = 3 };
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- exception handling
+    - its handshake between vendor and consumer.
+    - set_terminate(void (*fun)()):: used to override terminate method
+        - this should be registered before exception generation, else it wont call Myterminate method.
+    - exception or try-catch flow
+        - copy exception info into catch table.
+            - catch table per try.
+        - release local variables.
+        - copy into of exception into catch block and execute catch block.
+            - per try there may be number of catch blocks.
+            - after catch table executed catch table get die.
+        - local objects of catch block died first then catch table.
+    - general exception
+        try {
+            temp->CAT::CAT();
+        }
+        catch (...){        }//general exception_handling
+    - rethrow:: catch table information rethrown
+    - always catch with reference.
+    - exception should not overlap:: scenario like throwing exception in Dtor.
+        - Never throw exceptions from Dtor.
+    - gracefully throw exceptions from Ctor to avoid memory leak.
+    - internal operations on new operator
+        CAT *temp = operator new(){return addr}; // new operator exceptions are handled by inner try block.
+        try {
+            temp->CAT::CAT();
+        }
+        catch (...){
+            free(temp);
+            throw;
+        }
+        objPtr = temp;
+    -   If both base and derived classes are caught as exceptions then catch block of derived class must appear before the base class.
+        class Base {};
+        class Derived: public Base {};
+        fun() {
+            Derived d;
+            try {
+                throw d;
+            }
+            catch(Derived d) {
+                cout<<"Caught Derived Exception";
+            }
+            catch(Base b) {
+                cout<<"Caught Base Exception";
+            }
+        }
+    - The catch(...) must be the last catch block:: else gives compiler error
+        int main() {
+            try {
+            throw 10;
+            }
+            catch (int param) {
+                cout << "int exception\n";
+            }
+            catch (...) {
+                cout << "default exception\n";
+            }
+        }
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Inheritance
+    - lsp:: liskov's substitution principle
+        - base class hold's pointer or refernce of derived class object;
+        - object slicing: only visible sliced info that is base class info only.
+    - vertical access control:: change access specifier of member (excluding private member) of base class in derived class.
+        - using base_class::base_classmember
+            - using CA::idata;
+    - expose base method to user overload base method
+        - using base_class::base_class_method
+    - function/ mehtods in derived class
+        - hidding
+        - overload
+        - uppending
+        - overriding
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- virtual methods
+    - static array created in data segment:: vtable
+        - which contains virtual functions address list.
+    - vtable shared among all object.
+    - vptr:: which holds vtable address.
+    - object structure
+        - every object has its own vptr.
+        - other member are present at below vptr.
+    - calling non virtual method
+        - using object:: non virtual functions are directly resolved from code segment.
+        - using reference variable:: non virtual functions are directly resolved from code segment.
+        - using pointer:: non virtual functions are directly resolved from code segment.
+    - calling virtual method
+        - using object:: virtual functions are directly resolved from code segment.
+        - using reference variable:: virtual functions are resolved via vtable.
+        - using pointer:: virtual functions are resolved via vtable.
+    - funtion type
+        - overriding:: use override key to override virtual method in derived class
+            - void fun() override
+        - uppending:: adding new virtual method in derived class.
+            - on overloading base virtual method in derived class that method get upppended in vtable of derived class
+        - hidding:: derived class has method (non virtual method) with name of same as of base class.
+        - overloading:: derived class has method (base class virtual method) with name of same but different param as of base class.
+            - in this scenario new overloaded function get added in vtable of derived class.
+    - calling ctor with container
+        - call derived class ctor
+        - derived class ctor's prolog
+            - call to base class ctor
+            - setvptr:: derived class vtable
+            - container class ctor.
+        - execute derived class ctor body
+    - ctor and dtor
+        - in prolog of ctor and dtor setvptr is called
+    - override final
+        - won't allow further override in derived class.
+        - virutal fun () override final {}
+    - supress inheritance
+        - won't allow further inheritance.
+        - class CA final: class CB {}
+    - Ctor cant mark as virtual.
+    - Dtor can mark as virtual.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- polymorphisam
+    - run time polymorphisam:: lsp example
+    - static time polymorphisam:: override
+
+- multiple - inheritance
+    - when derived class inherited from multiple class then
+        - number of vtable is equal to number of base class
+            - class CC:class CA, class CB
+                - vtable's created vptr[0] and vptr[1] for class CA and class CB respectively.
+        - derived class virtual method are get added to most parent vtable's
+            - class CC:class CA, class CB
+                - class CC's virtual methods are get added to CA's vtable that is at vptr[0];
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- GRASP/ SOLID
+    - yagni
+    - Kiss
+    - low coupling
+    - high cohesion
+    - pure fabrication:: extract comman things and make another class.
+    - SRP
+    - OCP
+    - LOD
+    - LSP
+    - cyclomatic complexcity
+    - null object
+    - value object
+    - RTTI
+    - controlling
+    - creator
+    - DIP (IOC)
+    - protected variation.
+    - information export
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- Casting
+    - reinterpret_cast
+        - force casting.
+    - static_cast
+        - suppress intermediate casting
+    - const_cast
+        - can access constant address.
+    - dynamic_cast
+        - which work only on Polymorphic type
+        - if casting is proper it non null, else return null.
+        
+ - Namespace: avoid naming clashing
+     - Full exposure
+     - partial exposure
+     - nested namespace
+------------------------------------------------------------------------------------------------------------------------------------------------------    
+- tuple
+    - 
+        tuple<int , float, string> t(1,1.2f,"india");
+        int x = std::get<0>(t);
+        float y = std::get<1>(t);
+        string z = std::get<2>(t);
+    - 
+        tuple<int, float, char> mytuple;
+        mytuple = std::make_tuple(10,2.23f,'s');
+        std::tie(myint, std::ignore,mychar) = mytuple;
+        cout << "myint:: " << myint << " mychar:: " << mychar << endl;
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- ref() wrapper:: pass by reference
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- default and delete
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- varriadic template
+    - varriadic function
+        //1 specialized
+        template<typename Last>
+        void Display(Last val) {cout << "Last:: " << val<<endl;}
+        
+        //2 varriadic
+        template<typename First, typename... Rest>
+        void Display(First first, Rest... rest) {
+            cout << "First:: " << first<<endl;
+            Display(rest...);
+        }
+        
+        fun() {
+            Display(1,2.3,"3");
+        }
+    
+    - varriadic class
+        //1 declaire variadic templates
+        template<typename... types>
+        class MyOverload;
+
+        //2 varriadic_template
+        template<typename T, typename... types>
+        class MyOverload < T, types... > :MyOverload < types... > {
+        public:
+            using MyOverload<types...>::AddFun; // expose base methods
+            void AddFun(T x) {
+                cout << "AddFun called for type=" << typeid(T).name() << " x= " << x << endl;
+            }
+        };
+        
+        //3 specialized template
+        template<>
+        class MyOverload < > {
+        public:
+            void AddFun() {
+                cout << "From base most add fun" << endl;
+            }
+        };
+        fun () {
+            MyOverload<int, double, string> obj;
+            obj.AddFun();       //From base most add fun
+            obj.AddFun(10);     //int
+            obj.AddFun(20.3);   // double
+            obj.AddFun("sachin");// string
+        }
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- auto
+    - type gets infered.
+    - compile time technology.
+    - the data type is assumed depending upon value passed.
+    - using auto keyword
+        auto x = 12;, auto x = 12.8;,auto x = "12";
+    - type deduced to ...
+
+- decltype()
+    - acceccpts expression depending upon result type assigned
+        int x;float y;
+        decltype(x*y) z1 = 4.5;
+    - decltype():: always work with variable only.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- lambda expression/ closure:: which carries parent context to callback
+    - lambda expression internally it creates class{}
+        - class { cost int i; const int k;}
+        - ctor value initialized to value of i and k;
+        - with operator()(){} overloaded
+    - =:: all information are captured by value with as constant.
+    - &:: all information are captured by reference.
+    - mutable:: all information are captured can be modified.
+    - with parent context capturing 
+        - auto fun = []() {cout << "CallBack executing ..." << endl;};
+    - Capturing parent context with read only/ as const access.
+        - auto fun1 = [=]() {cout << "CallBack with Const ..." << i << " "<< pi<< endl;}; 
+    - Capturing with read/write access.
+        - auto fun2 = [=]()mutable {cout << "CallBack with Mutable ..." << ++i << " "<< pi<< endl;}; 
+    - Capturing by reference.
+        - auto fun3 = [&]() {cout << "CallBack with Reference ..." << ++i << " "<< pi<< endl;};
+    - Capturing partial reference and rest const.
+        - auto fun4 = [=,&i]() {cout << "CallBack with partial reference rest const ..." << ++i << " "<< pi<< endl;};
+    - Capturing specific members only
+        - auto fun5 = [i,pi]()mutable {cout << "CallBack with only i and pi ..." << ++i << " "<< pi<< endl;};
+        - auto fun6 = [&i,pi]() {cout << "CallBack with only i as a reference and pi as value..." << ++i << " "<< pi<< endl;};
+    - lambda capture work for
+        - std::function<>
+            - void VendorFunctionNew(std::function<void(void)> fun){}
+        - template
+            template<typename T>
+            void VendorFunction(T fun) {}
+    - lambda capture wont work for
+        - typedef
+            typedef void (*FPTR)();
+            void VendorFunction(FPTR fun) {}
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- bind
+    - uses placeholders.
+    function<float(float, float)> inv_div = bind(div1, _2, _1); // div1 called with 1st param as 2nd of inv_div and 2nd param as 1st of inv_div.
+    cout << "1/6 =" << inv_div(6, 1) << endl;   
+    cout << "2/6 =" << inv_div(6, 2) << endl;
+    cout << "3/6 =" << inv_div(6, 3) << endl;
+    //function<float(float)> div_by_6 = bind(div1, _1, 6);
+    auto div_by_6 = bind(div1, _1, 6);  // div1 called with 1st param as 1st of inv_div and 2nd param always 6.
+    cout << typeid(div_by_6).name() << endl;
+    cout << "______________________________" << endl;
+    cout << "1 / 6=" << div_by_6(1) << endl;
+    cout << "2 / 6=" << div_by_6(2) << endl;
+    cout << "3 / 6=" << div_by_6(3) << endl;
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- typededuced
+    - auto fun(T1 x, T1 y)->int{return x+y;}
+    - auto fun(T1 x, T1 y)->decltype(x*y){return (auto x = 20.0)}   // depending upon result type
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- range based loops
+    - for(auto i = arr[0]; i < 5; i++) {arr[i]}
+    - for (auto &val:arr) {val}
+    - for (auto val:arr) {val}
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- explicit casting
+    - need to provide explicit data type    
+        explicit CA::operator CB(){}
+        fun() {
+        CA Aobj;
+        CB Bobj = Aobj;     //gives error as we are using explicit keyword
+        CB Bobj1 = static_cast<CB>Aobj; // it should work as we are using explicit casting.
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- mem_fn
+    - which works as like operator "->*" in callback function.
+- std::ref((var):: get reference of var
+
+- union methods
+    - Like struct and class, union can have methods. Like struct and unlike class, members of union are public by default. Since data members of union share memory, the value of b becomes same as a.
+    - 
+        union A {
+            int a;
+            unsigned int b;
+            A() { a = 10; }
+            unsigned int getb() {return b;}
+        };        
+        fun() {
+            A obj;
+            cout << obj.getb();
+        }
+------------------------------------------------------------------------------------------------------------------------------------------------------
+- stl iterator'
+    - http://www.cplusplus.com/reference/vector/vector/

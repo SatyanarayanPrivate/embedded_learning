@@ -14,15 +14,18 @@ public:
     {
         this->real = real;
     }
-    friend ostream & DisplayComplex(ostream & os, CComplex & obj);
-    // friend  function:: non member function we define inside class or outside class
+    
+    friend ostream & DisplayComplex(ostream & os, CComplex & obj);  // friend  function:: non member function we define inside class or outside class
+    
     friend ostream & operator<<(ostream & os, CComplex & obj)
     {
+        os << "operator<<(ostream & os, CComplex & obj) called" << endl; 
         os << obj.real << (obj.imag >= 0.0 ? " + " : "") << obj.imag << "i" << endl;
         return os;
     }
     ostream & operator<<(ostream & os)
     {
+        os << "operator<<(ostream & os) called" << endl;
         os << this->real << (this->imag >= 0.0 ? " + " : "") << this->imag << "i" << endl;
         return os;
     }
@@ -55,34 +58,47 @@ ostream & DisplayComplex(ostream & os, CComplex & obj)
 int main()
 {
     CComplex c1;
+    int count = 0x00;
+    
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     DisplayComplex(cout, c1) << "tested DisplayComplex" << endl;
     operator<< (cout, c1) << "tested operatoroverloading_func" << endl;;
     cout << c1 << "tested operatoroverloading" << endl;
     cout << "-------------------------------------------" << endl;
-
+    
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     CComplex c2(12.34, 13.45);
     CComplex c3(15.44, -11.47);
     cout << c2;
     cout << c3;
     cout << "-------------------------------------------" << endl;
 
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     CComplex c4 = c2.AddCComplex(c3);
     cout << c4;
     cout << "-------------------------------------------" << endl;
 
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     CComplex c5 = c2 + c3;
     //CComplex c5 = c2.operator+(c3);
     cout << c5;
     cout << "-------------------------------------------" << endl;
 
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     CComplex c6 = c2 + 10; // add 10 to imaginary part
+    //CComplex c6 = c2.operator+(10);
     cout << c6;
     cout << "-------------------------------------------" << endl;
+    
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     CComplex c7 = 10 + c2; // add 10 to real part
+    //CComplex c7 = operator+(10, c2);
     cout << c7;
     cout << "-------------------------------------------" << endl;
     
+    cout << "\n----------------------" << ++count << "---------------------" << endl;
     c7 << cout;
+    //c7.operator<<(cout);
     
     return 0;
 }

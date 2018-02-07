@@ -58,14 +58,14 @@ int main()
     //one param Ctor
     //explicit Ctor
     CA obj2(300);
-    //CA obj2 = 200; // casting
+    //CA obj2 = 200; // compiler error: as casting is supressed with use of explicit during parameterized constructor
     obj2.Display();
-    //obj2 = 300;   // casting
+    //obj2 = 300;   // compiler error: as casting is supressed with use of explicit during parameterized constructor
     //obj2.Display();
     
     CB obj2_1(300);
     obj2_1.Display();
-    obj2_1 = 200; // dont need casting
+    obj2_1 = 200; // casting will work as explicit not used
     obj2_1.Display();
     
     // multi param ctor

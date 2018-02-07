@@ -17,13 +17,15 @@ public:
         //iConst = 23;    // compiler error: accessing read only member
     }    
     void ChangeState () const {
-        //         iConst = 29;  // compiler error: accessing read only member
+        //iConst = 29;  // compiler error: accessing read only member
+        //iInstance = 20; // assignment of member ‘CA::iInstance’ in read-only object
         iStatic = 302;
         iMutable = 401;
         //iConstStatic = 501; // compiler error: accessing read only member
     }
     void DisplayState () const {
-        cout << "\niConst = " << iConst << endl; 
+        cout << "\niInstance = " << iInstance << endl; 
+        cout << "iConst = " << iConst << endl; 
         cout << "iMutable = " << iMutable << endl;
         cout << "--------------------------------------------------- " << endl; 
     }
